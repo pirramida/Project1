@@ -1,67 +1,115 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TextField, Button, Container, Typography, Box } from '@mui/material';
 
 const LoginPage = ({ setIsLoggedIn }) => {
-  const [userName, setUserName] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoginMode, setIsLoginMode] = useState(true); // Для переключения между "Вход" и "Регистрация"
   const navigate = useNavigate();
 
-  // Обработчик для входа
-  const handleAuthorization = () => {
-    const storedUser = localStorage.getItem(userName);
-    if (storedUser && storedUser === password) {
+  const [userName, setUserName] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoginMode, setIsLoginMode] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleRegister = async () => {
+    setIsProcessing(true);
+    try {
+      const response = await fetch('http://localhost:4000/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: userName, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Ошибка регистрации');
+      }
+
+      const data = await response.json();
+      alert(`Регистрация успешна! Ваш ID: ${data.id}`);
       setIsLoggedIn(true);
-      navigate('/home'); // Переход на домашнюю страницу
-    } else {
-      alert('Неверные данные для входа');
+      navigate('/home');
+    } catch (err) {
+      console.error(err);
+      alert('Ошибка: ' + err.message);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  // Обработчик для регистрации
-  const handleRegistration = () => {
-    if (!userName || !password) {
-      alert('Пожалуйста, заполните все поля');
-      return;
+  const handleLogin = async () => {
+    setIsProcessing(true);
+    try {
+      const response = await fetch('http://localhost:4000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: userName, password }),
+      });
+
+      const data = await response.json();
+      if (data.error) {
+        alert(data.error);
+      } else {
+        alert(`Добро пожаловать! Ваш ID: ${data.id}`);
+        setIsLoggedIn(true);
+        navigate('/home');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Ошибка: ' + err.message);
+    } finally {
+      setIsProcessing(false);
     }
-    // Сохраняем данные пользователя в localStorage
-    localStorage.setItem(userName, password);
-    setIsLoggedIn(true);
-    navigate('/home'); // Переход на домашнюю страницу
   };
 
   return (
-    <div>
-      <h1>{isLoginMode ? 'Авторизация' : 'Регистрация'}</h1>
-      <div>
-        <input
-          type="text"
-          placeholder="Логин"
+    <Container maxWidth="xs">
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: 2 }}>
+        <Typography variant="h5" component="h1" gutterBottom>
+          {isLoginMode ? 'Авторизация' : 'Регистрация'}
+        </Typography>
+        <TextField
+          label="Логин"
+          variant="outlined"
+          fullWidth
           value={userName}
-          onChange={(e) => setUserName(e.target.value)} // Обновление состояния при изменении текста
+          onChange={(e) => {
+            setUserName(e.target.value);
+          }}
+          sx={{ marginBottom: 2 }}
+          disabled={isProcessing}
         />
-      </div>
-      <div>
-        <input
+        <TextField
+          label="Пароль"
           type="password"
-          placeholder="Пароль"
+          variant="outlined"
+          fullWidth
           value={password}
-          onChange={(e) => setPassword(e.target.value)} // Обновление состояния при изменении текста
+          onChange={(e) => {
+            setPassword(e.target.value);
+          }}
+          sx={{ marginBottom: 2 }}
+          disabled={isProcessing}
         />
-      </div>
-      <div>
-        {isLoginMode ? (
-          <button onClick={handleAuthorization}>Вход</button>
-        ) : (
-          <button onClick={handleRegistration}>Зарегистрироваться</button>
-        )}
-      </div>
-      <div>
-        <button onClick={() => setIsLoginMode(!isLoginMode)}>
-          {isLoginMode ? 'Нет аккаунта? Зарегистрироваться' : 'Уже зарегистрированы? Войти'}
-        </button>
-      </div>
-    </div>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={isLoginMode ? handleLogin : handleRegister}
+          fullWidth
+          sx={{ marginBottom: 2 }}
+          disabled={isProcessing}
+        >
+          {isLoginMode ? 'Войти' : 'Зарегистрироваться'}
+        </Button>
+        <Button
+          variant="text"
+          color="secondary"
+          onClick={() => setIsLoginMode(!isLoginMode)}
+          fullWidth
+          disabled={isProcessing}
+        >
+          {isLoginMode ? 'Нет аккаунта? Зарегистрироваться' : 'Уже зарегистрированы? Войти!'}
+        </Button>
+      </Box>
+    </Container>
   );
 };
 
