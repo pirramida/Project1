@@ -11,6 +11,8 @@ const LoginPage = ({ setIsLoggedIn }) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleRegister = async () => {
+    if (!password || !userName) {alert('Введите пароль и имя'); return;}
+
     setIsProcessing(true);
     try {
       const response = await fetch('http://localhost:4000/auth/register', {
@@ -22,10 +24,9 @@ const LoginPage = ({ setIsLoggedIn }) => {
       if (!response.ok) {
         throw new Error('Ошибка регистрации');
       }
-
-      const data = await response.json();
-      alert(`Регистрация успешна! Ваш ID: ${data.id}`);
       setIsLoggedIn(true);
+      localStorage.setItem('user', JSON.stringify(userName));
+
       navigate('/home');
     } catch (err) {
       console.error(err);
@@ -36,6 +37,7 @@ const LoginPage = ({ setIsLoggedIn }) => {
   };
 
   const handleLogin = async () => {
+    if (!password || !userName) {alert('Введите пароль и имя'); return;}
     setIsProcessing(true);
     try {
       const response = await fetch('http://localhost:4000/auth/login', {
@@ -48,13 +50,12 @@ const LoginPage = ({ setIsLoggedIn }) => {
       if (data.error) {
         alert(data.error);
       } else {
-        alert(`Добро пожаловать! Ваш ID: ${data.id}`);
+        localStorage.setItem('user', JSON.stringify(userName));
         setIsLoggedIn(true);
         navigate('/home');
       }
     } catch (err) {
       console.error(err);
-      alert('Ошибка: ' + err.message);
     } finally {
       setIsProcessing(false);
     }
