@@ -4,13 +4,18 @@ import LoginPage from "./Pages/LoginPage/LoginPage";
 import Home from "./Pages/HomePage/Home";
 import ArchivePage from "./Pages/ArchivPage/Archive";
 import Header from "./Header";
+import Game from "./Pages/GamePricool/Gamepricool";
+import Svgtest from "./Pages/SVGtestPage/Svgpage";
+import Library from "./Pages/LibraryPage/Library";
+import BurgerMenu from "./Components/BurgerMenu/BurgerMenu";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
     <>
-    <Header />
+    <Header setIsLoggedIn={setIsLoggedIn} />
+    <BurgerMenu />
 
     <Routes>
       <Route
@@ -19,15 +24,27 @@ function App() {
       />
       <Route
         path="/home"
-        element={isLoggedIn ? <Home setIsLoggedIn={setIsLoggedIn} /> : <Navigate to="/login" />}
+        element={isLoggedIn ? <Home to="/home"/> : <Navigate to="/login" />}
       />
       <Route
         path="/"
-        element={isLoggedIn ? <Navigate to="/home" /> : <Navigate to="/login" />}
+        element={isLoggedIn ? <Navigate to="/" /> : <Navigate to="/login" />}
       />
       <Route 
         path="/archive"
-        element={<ArchivePage/>}
+        element={isLoggedIn ? <ArchivePage to="/archive" /> : <Navigate to="/login" />}
+      />
+      <Route
+        path="/game"
+        element={isLoggedIn ? <Game to="/game" /> : <Navigate to="/login" />}
+      />
+      <Route
+      path="/svgtest"
+      element={isLoggedIn ? <Svgtest to='/svgtest' /> : <Navigate to='/login' /> }
+      />
+      <Route
+      path="/library"
+      element={isLoggedIn ? <Library to='/library' /> : <Navigate to='/login' />}
       />
     </Routes>
     </>

@@ -1,7 +1,7 @@
-// public/electron.js
 
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+app.commandLine.appendSwitch('ignore-certificate-errors');
 
 // Функция для создания окна
 function createWindow() {
@@ -13,8 +13,9 @@ function createWindow() {
       contextIsolation: false, // Чтобы использовать Node.js в браузере
     },
   });
+  
 
-  win.loadURL('http://localhost:3000'); // Загружаем React-приложение, которое будет работать на порту 3000
+  win.loadURL('http://localhost:3000');
 }
 
 // Когда приложение готово, создаем окно

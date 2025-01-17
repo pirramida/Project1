@@ -2,27 +2,27 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Container, Typography, Box } from '@mui/material';
 
+
 const LoginPage = ({ setIsLoggedIn }) => {
   const navigate = useNavigate();
 
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const [isLoginMode, setIsLoginMode] = useState(true);
-  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleRegister = async () => {
-    if (!password || !userName) {alert('Введите пароль и имя'); return;}
+    if (!password || !userName) { return;}
 
-    setIsProcessing(true);
     try {
-      const response = await fetch('http://localhost:4000/auth/register', {
+      const response = await fetch('https://localhost:4000/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: userName, password }),
       });
-
-      if (!response.ok) {
-        throw new Error('Ошибка регистрации');
+      const data = await response.json();
+      if (data.error) {
+        console.log(data.error);
+        return;
       }
       setIsLoggedIn(true);
       localStorage.setItem('user', JSON.stringify(userName));
@@ -30,25 +30,21 @@ const LoginPage = ({ setIsLoggedIn }) => {
       navigate('/home');
     } catch (err) {
       console.error(err);
-      alert('Ошибка: ' + err.message);
-    } finally {
-      setIsProcessing(false);
     }
   };
 
   const handleLogin = async () => {
-    if (!password || !userName) {alert('Введите пароль и имя'); return;}
-    setIsProcessing(true);
+    if (!password || !userName) { return;}
     try {
-      const response = await fetch('http://localhost:4000/auth/login', {
+      const response = await fetch('https://localhost:4000/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: userName, password }),
       });
-
       const data = await response.json();
+
       if (data.error) {
-        alert(data.error);
+        return;
       } else {
         localStorage.setItem('user', JSON.stringify(userName));
         setIsLoggedIn(true);
@@ -56,9 +52,7 @@ const LoginPage = ({ setIsLoggedIn }) => {
       }
     } catch (err) {
       console.error(err);
-    } finally {
-      setIsProcessing(false);
-    }
+    } 
   };
 
   return (
@@ -76,7 +70,6 @@ const LoginPage = ({ setIsLoggedIn }) => {
             setUserName(e.target.value);
           }}
           sx={{ marginBottom: 2 }}
-          disabled={isProcessing}
         />
         <TextField
           label="Пароль"
@@ -88,7 +81,6 @@ const LoginPage = ({ setIsLoggedIn }) => {
             setPassword(e.target.value);
           }}
           sx={{ marginBottom: 2 }}
-          disabled={isProcessing}
         />
         <Button
           variant="contained"
@@ -96,7 +88,6 @@ const LoginPage = ({ setIsLoggedIn }) => {
           onClick={isLoginMode ? handleLogin : handleRegister}
           fullWidth
           sx={{ marginBottom: 2 }}
-          disabled={isProcessing}
         >
           {isLoginMode ? 'Войти' : 'Зарегистрироваться'}
         </Button>
@@ -105,7 +96,6 @@ const LoginPage = ({ setIsLoggedIn }) => {
           color="secondary"
           onClick={() => setIsLoginMode(!isLoginMode)}
           fullWidth
-          disabled={isProcessing}
         >
           {isLoginMode ? 'Нет аккаунта? Зарегистрироваться' : 'Уже зарегистрированы? Войти!'}
         </Button>

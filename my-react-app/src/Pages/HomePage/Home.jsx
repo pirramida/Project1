@@ -2,22 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Typography, Container, Box } from '@mui/material';
 
-const Home = ({ setIsLoggedIn }) => {
+const Home = () => {
   const navigate = useNavigate();
   const [comment, setComment] = useState('');
-
-  const comeBack = () => {
-    setIsLoggedIn(false);
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
-
-  const sendComment = async (comment) => {
+  
+  const sendComment = async (comment) => {  
     if (!comment) return;
     const user = JSON.parse(localStorage.getItem('user'));
 
     try {
-      const response = await fetch('http://localhost:4000/archive', {
+      const response = await fetch('https://localhost:4000/archive', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +64,6 @@ const Home = ({ setIsLoggedIn }) => {
         </Button>
         
       </Box>
-      <Button variant="outlined" onClick={comeBack}>Выход</Button>
 
     </Container>
   );
