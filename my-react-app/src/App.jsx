@@ -8,12 +8,13 @@ import Game from "./Pages/GamePricool/Gamepricool";
 import Svgtest from "./Pages/SVGtestPage/Svgpage";
 import Library from "./Pages/LibraryPage/Library";
 import BurgerMenu from "./Components/BurgerMenu/BurgerMenu";
+import ToDoList from './Pages/ToDoList/ToDoList';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
-    <>фывфыв
+    <>
     <Header setIsLoggedIn={setIsLoggedIn} />
     <BurgerMenu />
 
@@ -45,6 +46,10 @@ function App() {
       <Route
       path="/library"
       element={isLoggedIn ? <Library to='/library' /> : <Navigate to='/login' />}
+      />
+      <Route 
+      path="/todolist"
+      element={isLoggedIn ? <ToDoList to='/todolist'/> : <Navigate to='/login'/>}
       />
     </Routes>
     </>
